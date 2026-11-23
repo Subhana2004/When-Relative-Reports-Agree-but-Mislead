@@ -1,0 +1,159 @@
+{
+  "status": "posthoc-exploratory",
+  "protocol": {
+    "status": "exploratory post-hoc training-size study",
+    "regime": "heavy",
+    "size_strata": {
+      "sizes": [
+        10,
+        12
+      ],
+      "families": [
+        "chain_scc",
+        "layered"
+      ],
+      "effects": [
+        0,
+        1
+      ]
+    },
+    "sizes": [
+      24,
+      48,
+      96,
+      192
+    ],
+    "model_seeds": [
+      71,
+      73,
+      79
+    ],
+    "training_data_seeds": [
+      314159,
+      271828
+    ],
+    "report_seed_note": "deterministically derived from model seed; not an independent report-noise replication",
+    "fixed_updates": 192,
+    "fixed_graph_forwards": 768,
+    "arms": [
+      "weighted_soft",
+      "joint_independent"
+    ],
+    "test_draw_seeds": {
+      "original": [
+        1618033,
+        1414213,
+        1732051,
+        2236067,
+        2449489
+      ],
+      "arborescence": [
+        20261,
+        20262,
+        20263
+      ]
+    },
+    "no_test_labels_in_training": true,
+    "oracle_is_only_evaluation": true,
+    "compute_warning": "additional marginalization arithmetic not matched by graph forwards"
+  },
+  "summary": [
+    {
+      "family": "original",
+      "size": 24,
+      "soft_mean": 0.958333,
+      "joint_mean": 0.997222,
+      "diff_pp": 3.8889,
+      "joint_min": 0.983333,
+      "joint_zero_seeds": 0,
+      "pair_wins": 4,
+      "pair_ties": 2,
+      "pair_losses": 0
+    },
+    {
+      "family": "original",
+      "size": 48,
+      "soft_mean": 0.986111,
+      "joint_mean": 0.833333,
+      "diff_pp": -15.2778,
+      "joint_min": 0.0,
+      "joint_zero_seeds": 1,
+      "pair_wins": 2,
+      "pair_ties": 3,
+      "pair_losses": 1
+    },
+    {
+      "family": "original",
+      "size": 96,
+      "soft_mean": 0.968056,
+      "joint_mean": 0.797222,
+      "diff_pp": -17.0833,
+      "joint_min": 0.241667,
+      "joint_zero_seeds": 0,
+      "pair_wins": 2,
+      "pair_ties": 1,
+      "pair_losses": 3
+    },
+    {
+      "family": "original",
+      "size": 192,
+      "soft_mean": 0.986111,
+      "joint_mean": 0.983333,
+      "diff_pp": -0.2778,
+      "joint_min": 0.933333,
+      "joint_zero_seeds": 0,
+      "pair_wins": 1,
+      "pair_ties": 4,
+      "pair_losses": 1
+    },
+    {
+      "family": "arborescence",
+      "size": 24,
+      "soft_mean": 0.998843,
+      "joint_mean": 0.998843,
+      "diff_pp": 0.0,
+      "joint_min": 0.993056,
+      "joint_zero_seeds": 0,
+      "pair_wins": 1,
+      "pair_ties": 4,
+      "pair_losses": 1
+    },
+    {
+      "family": "arborescence",
+      "size": 48,
+      "soft_mean": 0.998843,
+      "joint_mean": 0.833333,
+      "diff_pp": -16.5509,
+      "joint_min": 0.0,
+      "joint_zero_seeds": 1,
+      "pair_wins": 1,
+      "pair_ties": 4,
+      "pair_losses": 1
+    },
+    {
+      "family": "arborescence",
+      "size": 96,
+      "soft_mean": 1.0,
+      "joint_mean": 0.835648,
+      "diff_pp": -16.4352,
+      "joint_min": 0.333333,
+      "joint_zero_seeds": 0,
+      "pair_wins": 0,
+      "pair_ties": 4,
+      "pair_losses": 2
+    },
+    {
+      "family": "arborescence",
+      "size": 192,
+      "soft_mean": 1.0,
+      "joint_mean": 1.0,
+      "diff_pp": 0.0,
+      "joint_min": 1.0,
+      "joint_zero_seeds": 0,
+      "pair_wins": 0,
+      "pair_ties": 6,
+      "pair_losses": 0
+    }
+  ],
+  "sha256_raw": "2760d75573daacec273670db0f8e9919ff4043026122280dff14541ccc8f876b"
+}

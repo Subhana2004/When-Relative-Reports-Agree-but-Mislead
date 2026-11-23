@@ -1,0 +1,95 @@
+{
+  "note": "Veli\u010dkovi\u0107-style intermediate-state supervision adaptation; additional oracle information, not an information-matched baseline",
+  "rows": [
+    {
+      "seed": 71,
+      "draw_index": 0,
+      "cqa": 0.9166666666666666,
+      "training_seconds": 4.601716677000013
+    },
+    {
+      "seed": 71,
+      "draw_index": 1,
+      "cqa": 0.9583333333333334,
+      "training_seconds": 5.5176448880000635
+    },
+    {
+      "seed": 71,
+      "draw_index": 2,
+      "cqa": 0.9583333333333334,
+      "training_seconds": 6.659537032999992
+    },
+    {
+      "seed": 71,
+      "draw_index": 3,
+      "cqa": 0.9166666666666666,
+      "training_seconds": 7.509336672000018
+    },
+    {
+      "seed": 71,
+      "draw_index": 4,
+      "cqa": 0.9166666666666666,
+      "training_seconds": 8.47794994800006
+    },
+    {
+      "seed": 79,
+      "draw_index": 0,
+      "cqa": 1.0,
+      "training_seconds": 4.592492018999906
+    },
+    {
+      "seed": 79,
+      "draw_index": 1,
+      "cqa": 1.0,
+      "training_seconds": 5.514146142999948
+    },
+    {
+      "seed": 79,
+      "draw_index": 2,
+      "cqa": 1.0,
+      "training_seconds": 6.4799672109999165
+    },
+    {
+      "seed": 79,
+      "draw_index": 3,
+      "cqa": 1.0,
+      "training_seconds": 7.250701503999949
+    },
+    {
+      "seed": 79,
+      "draw_index": 4,
+      "cqa": 1.0,
+      "training_seconds": 8.273186320999912
+    },
+    {
+      "seed": 89,
+      "draw_index": 0,
+      "cqa": 1.0,
+      "training_seconds": 4.350009751000016
+    },
+    {
+      "seed": 89,
+      "draw_index": 1,
+      "cqa": 1.0,
+      "training_seconds": 5.225069122000036
+    },
+    {
+      "seed": 89,
+      "draw_index": 2,
+      "cqa": 1.0,
+      "training_seconds": 6.209401462999949
+    },
+    {
+      "seed": 89,
+      "draw_index": 3,
+      "cqa": 1.0,
+      "training_seconds": 6.921830787999966
+    },
+    {
+      "seed": 89,
+      "draw_index": 4,
+      "cqa": 1.0,
+      "training_seconds": 7.829012530999989
+    }
+  ]
+}

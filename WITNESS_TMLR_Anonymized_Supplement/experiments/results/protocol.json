@@ -1,0 +1,79 @@
+{
+  "seeds": [
+    71,
+    73,
+    79,
+    83,
+    89,
+    97,
+    101,
+    103,
+    107,
+    109,
+    113,
+    127
+  ],
+  "graph_seeds": [
+    1618033,
+    1414213,
+    1732051,
+    2236067,
+    2449489
+  ],
+  "train_graph_seed": 314159,
+  "train_quadruples": 24,
+  "test_quadruples_per_draw": 24,
+  "train_component_sizes": [
+    10,
+    12
+  ],
+  "test_component_sizes": [
+    22,
+    34,
+    48
+  ],
+  "train_families": [
+    "chain_scc",
+    "layered"
+  ],
+  "test_families": [
+    "branch",
+    "dense_scc"
+  ],
+  "oracle_on_training": false,
+  "epochs": 6,
+  "updates": 144,
+  "graph_forwards": 576,
+  "arms": {
+    "heavy": [
+      "anchor",
+      "unweighted_map",
+      "em_soft",
+      "weighted_soft",
+      "joint_independent",
+      "oracle"
+    ],
+    "correlated": [
+      "unweighted_map",
+      "em_soft",
+      "weighted_soft",
+      "joint_independent",
+      "robust_soft",
+      "joint_robust"
+    ]
+  },
+  "correlated_event_actual": 0.28,
+  "correlated_event_model": 0.2,
+  "fixed_noise_probs": {
+    "heavy": [
+      0.16,
+      0.46
+    ],
+    "correlated": [
+      0.06,
+      0.3
+    ]
+  },
+  "validation": "exploratory extension after earlier pilot/replication; no claim of external preregistration",
+  "published_method_status": "EM adapted from latent-label method; Bayesian posterior and BFS are analytic controls; no external software method faithfully reproduced"
+}
