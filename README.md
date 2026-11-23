@@ -57,3 +57,11 @@ The original MIT license in this repository is retained. All experiments are syn
 ### Double-blind submission warning
 
 **This GitHub repository is public and linked to a named GitHub account. Its URL and commit history could reveal author identity. Do not put this URL into a double-blind TMLR submission or anonymized supplementary material.** Submit the separate anonymized supplement through the review platform, subject to the venue's current policies; the public repository is intended for later open reproducibility and collaboration.
+
+## Exploratory reviewer-response extension (not yet part of the journal manuscript)
+
+The separately run **fixed-update training-size pilot** used two independent training-data pools, three coupled model/report seeds, two neural objectives, and 24/48/96/192 quadruples, with **192 optimizer updates (768 graph forwards)** per run. This totals 48 training runs and 384 draw-level evaluations. See [`docs/EXPLORATORY_SIZE_SWEEP.md`](docs/EXPLORATORY_SIZE_SWEEP.md) and [`results/size_sweep_exploratory.json`](results/size_sweep_exploratory.json). In the original-generator test draws, Bayesian soft-label CQA was **95.8%, 98.6%, 96.8%, 98.6%** at 24/48/96/192; the joint objective scored **99.7%, 83.3%, 79.7%, 98.3%**. With only six matched model/data-seed cells, these pilot differences are not generalizable statistical findings. The alternate test draws frequently saturate at 100% and cannot establish a scaling benefit.
+
+A non-mirrored degree-preserving edge-swap **feasibility harness** for SNAP's directed [Gnutella08 network](https://snap.stanford.edu/data/p2p-Gnutella08.html) is included in [`run_external_snap_protocol.py`](run_external_snap_protocol.py). **Natural-network experiments have not been executed**: this script requires downloading the official dataset. Synthetic harness checks passed, but their labels do not demonstrate real-world performance. See [`docs/EXTERNAL_GRAPH_PROTOCOL.md`](docs/EXTERNAL_GRAPH_PROTOCOL.md).
+
+The audit also now distinguishes neural-only training times from omitted label-estimator preprocessing; see [`docs/COMPUTE_AUDIT.md`](docs/COMPUTE_AUDIT.md). The original archived package still contains **55 passing tests**, and the browseable repository source now contains **61 passing tests** with the additional protocol tests.

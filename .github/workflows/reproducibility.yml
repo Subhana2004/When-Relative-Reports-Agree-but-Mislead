@@ -40,4 +40,6 @@ jobs:
       - name: Verify browseable source tests
         run: |
           export PYTHONPATH=.:WITNESS_TMLR_Anonymized_Supplement
-          python -m pytest -q test_published_validation.py WITNESS_TMLR_Anonymized_Supplement/experiments/test_method.py WITNESS_TMLR_Anonymized_Supplement/tests
+          python -m pytest -q test_published_validation.py test_new_protocols.py WITNESS_TMLR_Anonymized_Supplement/experiments/test_method.py WITNESS_TMLR_Anonymized_Supplement/tests
+      - name: Check exploratory size-sweep raw results
+        run: python analyze_size_sweep.py
