@@ -1,0 +1,545 @@
+{
+  "label": {
+    "heavy": {
+      "summary": {
+        "tree": {
+          "model": "tree",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.3193,
+          "query_accuracy": 0.7385,
+          "brier": 0.2615
+        },
+        "unweighted_map": {
+          "model": "unweighted_map",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.3926,
+          "query_accuracy": 0.75,
+          "brier": 0.25
+        },
+        "weighted_map": {
+          "model": "weighted_map",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.4805,
+          "query_accuracy": 0.7903,
+          "brier": 0.2097
+        },
+        "weighted_soft": {
+          "model": "weighted_soft",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.4688,
+          "query_accuracy": 0.7976,
+          "brier": 0.1304
+        },
+        "spectral_unweighted": {
+          "model": "spectral_unweighted",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.3955,
+          "query_accuracy": 0.7493,
+          "brier": 0.2507
+        },
+        "spectral_weighted": {
+          "model": "spectral_weighted",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.4805,
+          "query_accuracy": 0.7932,
+          "brier": 0.2068
+        },
+        "dawid_skene": {
+          "model": "dawid_skene",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.3701,
+          "query_accuracy": 0.7617,
+          "brier": 0.162
+        },
+        "mixture_soft": {
+          "model": "mixture_soft",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.4688,
+          "query_accuracy": 0.7976,
+          "brier": 0.1396
+        }
+      },
+      "contrasts": {
+        "spectral_weighted_minus_weighted_map": {
+          "mean_pp": 0.0,
+          "pair_cluster_boot_pp": [
+            -1.172,
+            1.172
+          ]
+        },
+        "dawid_skene_minus_weighted_soft": {
+          "mean_pp": -9.863,
+          "pair_cluster_boot_pp": [
+            -12.502,
+            -7.227
+          ]
+        },
+        "mixture_soft_minus_weighted_soft": {
+          "mean_pp": 0.0,
+          "pair_cluster_boot_pp": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "correlated": {
+      "summary": {
+        "tree": {
+          "model": "tree",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.3926,
+          "query_accuracy": 0.7107,
+          "brier": 0.2893
+        },
+        "unweighted_map": {
+          "model": "unweighted_map",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.5029,
+          "query_accuracy": 0.73,
+          "brier": 0.27
+        },
+        "weighted_map": {
+          "model": "weighted_map",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.5488,
+          "query_accuracy": 0.7476,
+          "brier": 0.2524
+        },
+        "weighted_soft": {
+          "model": "weighted_soft",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.5439,
+          "query_accuracy": 0.7522,
+          "brier": 0.1991
+        },
+        "spectral_unweighted": {
+          "model": "spectral_unweighted",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.5068,
+          "query_accuracy": 0.7329,
+          "brier": 0.2671
+        },
+        "spectral_weighted": {
+          "model": "spectral_weighted",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.5508,
+          "query_accuracy": 0.7522,
+          "brier": 0.2478
+        },
+        "dawid_skene": {
+          "model": "dawid_skene",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.4492,
+          "query_accuracy": 0.7327,
+          "brier": 0.2105
+        },
+        "mixture_soft": {
+          "model": "mixture_soft",
+          "n_examples": 1024.0,
+          "complete_label_accuracy": 0.5439,
+          "query_accuracy": 0.7522,
+          "brier": 0.1655
+        }
+      },
+      "contrasts": {
+        "spectral_weighted_minus_weighted_map": {
+          "mean_pp": 0.195,
+          "pair_cluster_boot_pp": [
+            -0.293,
+            0.781
+          ]
+        },
+        "dawid_skene_minus_weighted_soft": {
+          "mean_pp": -9.473,
+          "pair_cluster_boot_pp": [
+            -11.621,
+            -7.324
+          ]
+        },
+        "mixture_soft_minus_weighted_soft": {
+          "mean_pp": 0.0,
+          "pair_cluster_boot_pp": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  },
+  "neural": {
+    "heavy/old_generator": {
+      "by_arm": {
+        "dawid_skene_soft": {
+          "mean_cqa": 0.32708,
+          "n_rows": 60,
+          "n_seeds": 12,
+          "n_draws": 5
+        },
+        "joint_independent": {
+          "mean_cqa": 0.68889,
+          "n_rows": 60,
+          "n_seeds": 12,
+          "n_draws": 5
+        },
+        "spectral_weighted": {
+          "mean_cqa": 0.80556,
+          "n_rows": 60,
+          "n_seeds": 12,
+          "n_draws": 5
+        },
+        "weighted_soft": {
+          "mean_cqa": 0.84653,
+          "n_rows": 60,
+          "n_seeds": 12,
+          "n_draws": 5
+        }
+      },
+      "paired": {
+        "joint_independent_minus_weighted_soft": {
+          "mean_pp": -15.764,
+          "interval_pp": [
+            -39.931,
+            2.571
+          ],
+          "per_seed_mean_pp": {
+            "71": 0.0,
+            "73": 0.0,
+            "79": 3.333,
+            "83": -6.667,
+            "89": 2.5,
+            "97": 0.0,
+            "101": 6.667,
+            "103": 0.0,
+            "107": -1.667,
+            "109": -100.0,
+            "113": 0.0,
+            "127": -93.333
+          }
+        },
+        "spectral_weighted_minus_weighted_soft": {
+          "mean_pp": -4.097,
+          "interval_pp": [
+            -12.5,
+            2.5
+          ],
+          "per_seed_mean_pp": {
+            "71": 0.0,
+            "73": -2.5,
+            "79": 0.0,
+            "83": 4.167,
+            "89": -5.0,
+            "97": 0.0,
+            "101": 1.667,
+            "103": 0.0,
+            "107": -10.0,
+            "109": -42.5,
+            "113": 0.0,
+            "127": 5.0
+          }
+        },
+        "dawid_skene_soft_minus_weighted_soft": {
+          "mean_pp": -51.944,
+          "interval_pp": [
+            -78.264,
+            -25.274
+          ],
+          "per_seed_mean_pp": {
+            "71": -2.5,
+            "73": -100.0,
+            "79": -91.667,
+            "83": -45.833,
+            "89": -97.5,
+            "97": 0.0,
+            "101": 1.667,
+            "103": 0.0,
+            "107": -94.167,
+            "109": -100.0,
+            "113": 0.0,
+            "127": -93.333
+          }
+        }
+      }
+    },
+    "heavy/arborescence": {
+      "by_arm": {
+        "dawid_skene_soft": {
+          "mean_cqa": 0.3588,
+          "n_rows": 36,
+          "n_seeds": 12,
+          "n_draws": 3
+        },
+        "joint_independent": {
+          "mean_cqa": 0.71586,
+          "n_rows": 36,
+          "n_seeds": 12,
+          "n_draws": 3
+        },
+        "spectral_weighted": {
+          "mean_cqa": 0.87326,
+          "n_rows": 36,
+          "n_seeds": 12,
+          "n_draws": 3
+        },
+        "weighted_soft": {
+          "mean_cqa": 0.85938,
+          "n_rows": 36,
+          "n_seeds": 12,
+          "n_draws": 3
+        }
+      },
+      "paired": {
+        "joint_independent_minus_weighted_soft": {
+          "mean_pp": -14.352,
+          "interval_pp": [
+            -39.41,
+            4.282
+          ],
+          "per_seed_mean_pp": {
+            "71": 0.0,
+            "73": 0.0,
+            "79": 0.0,
+            "83": 25.694,
+            "89": 0.0,
+            "97": 0.0,
+            "101": 0.0,
+            "103": 0.0,
+            "107": 0.0,
+            "109": -100.0,
+            "113": 0.0,
+            "127": -97.917
+          }
+        },
+        "spectral_weighted_minus_weighted_soft": {
+          "mean_pp": 1.389,
+          "interval_pp": [
+            -1.275,
+            5.498
+          ],
+          "per_seed_mean_pp": {
+            "71": 0.0,
+            "73": 0.0,
+            "79": 0.0,
+            "83": 1.389,
+            "89": 0.0,
+            "97": 20.833,
+            "101": 0.0,
+            "103": 0.0,
+            "107": 0.0,
+            "109": -6.25,
+            "113": 0.0,
+            "127": 0.694
+          }
+        },
+        "dawid_skene_soft_minus_weighted_soft": {
+          "mean_pp": -50.058,
+          "interval_pp": [
+            -75.291,
+            -24.884
+          ],
+          "per_seed_mean_pp": {
+            "71": 0.0,
+            "73": -100.0,
+            "79": -66.667,
+            "83": -33.333,
+            "89": -100.0,
+            "97": 0.0,
+            "101": -2.778,
+            "103": 0.0,
+            "107": -100.0,
+            "109": -100.0,
+            "113": 0.0,
+            "127": -97.917
+          }
+        }
+      }
+    },
+    "correlated/old_generator": {
+      "by_arm": {
+        "dawid_skene_soft": {
+          "mean_cqa": 0.53333,
+          "n_rows": 60,
+          "n_seeds": 12,
+          "n_draws": 5
+        },
+        "joint_robust": {
+          "mean_cqa": 0.85417,
+          "n_rows": 60,
+          "n_seeds": 12,
+          "n_draws": 5
+        },
+        "robust_soft": {
+          "mean_cqa": 0.88472,
+          "n_rows": 60,
+          "n_seeds": 12,
+          "n_draws": 5
+        },
+        "spectral_weighted": {
+          "mean_cqa": 0.70903,
+          "n_rows": 60,
+          "n_seeds": 12,
+          "n_draws": 5
+        }
+      },
+      "paired": {
+        "joint_robust_minus_robust_soft": {
+          "mean_pp": -3.056,
+          "interval_pp": [
+            -22.087,
+            9.722
+          ],
+          "per_seed_mean_pp": {
+            "71": 0.833,
+            "73": 0.0,
+            "79": 21.667,
+            "83": 10.0,
+            "89": 0.0,
+            "97": -6.667,
+            "101": 15.833,
+            "103": 5.0,
+            "107": 0.0,
+            "109": -100.0,
+            "113": -2.5,
+            "127": 19.167
+          }
+        },
+        "spectral_weighted_minus_robust_soft": {
+          "mean_pp": -17.569,
+          "interval_pp": [
+            -39.028,
+            0.208
+          ],
+          "per_seed_mean_pp": {
+            "71": -55.0,
+            "73": 0.0,
+            "79": -14.167,
+            "83": -5.0,
+            "89": -100.0,
+            "97": -2.5,
+            "101": 3.333,
+            "103": 5.0,
+            "107": 0.0,
+            "109": -54.167,
+            "113": 0.0,
+            "127": 11.667
+          }
+        },
+        "dawid_skene_soft_minus_robust_soft": {
+          "mean_pp": -35.139,
+          "interval_pp": [
+            -59.446,
+            -11.804
+          ],
+          "per_seed_mean_pp": {
+            "71": 0.833,
+            "73": -100.0,
+            "79": -58.333,
+            "83": -2.5,
+            "89": 0.0,
+            "97": -100.0,
+            "101": -5.0,
+            "103": 3.333,
+            "107": -98.333,
+            "109": -25.0,
+            "113": 0.0,
+            "127": -36.667
+          }
+        }
+      }
+    },
+    "correlated/arborescence": {
+      "by_arm": {
+        "dawid_skene_soft": {
+          "mean_cqa": 0.61921,
+          "n_rows": 36,
+          "n_seeds": 12,
+          "n_draws": 3
+        },
+        "joint_robust": {
+          "mean_cqa": 0.85938,
+          "n_rows": 36,
+          "n_seeds": 12,
+          "n_draws": 3
+        },
+        "robust_soft": {
+          "mean_cqa": 0.8912,
+          "n_rows": 36,
+          "n_seeds": 12,
+          "n_draws": 3
+        },
+        "spectral_weighted": {
+          "mean_cqa": 0.78762,
+          "n_rows": 36,
+          "n_seeds": 12,
+          "n_draws": 3
+        }
+      },
+      "paired": {
+        "joint_robust_minus_robust_soft": {
+          "mean_pp": -3.183,
+          "interval_pp": [
+            -22.629,
+            10.938
+          ],
+          "per_seed_mean_pp": {
+            "71": 0.0,
+            "73": 0.0,
+            "79": 1.389,
+            "83": 0.0,
+            "89": 0.0,
+            "97": 0.694,
+            "101": 30.556,
+            "103": 0.0,
+            "107": 0.0,
+            "109": -100.0,
+            "113": 0.0,
+            "127": 29.167
+          }
+        },
+        "spectral_weighted_minus_robust_soft": {
+          "mean_pp": -10.359,
+          "interval_pp": [
+            -29.687,
+            2.604
+          ],
+          "per_seed_mean_pp": {
+            "71": -6.25,
+            "73": 0.0,
+            "79": -33.333,
+            "83": 0.0,
+            "89": -100.0,
+            "97": 0.694,
+            "101": 2.778,
+            "103": 0.0,
+            "107": 0.0,
+            "109": -6.25,
+            "113": 0.0,
+            "127": 18.056
+          }
+        },
+        "dawid_skene_soft_minus_robust_soft": {
+          "mean_pp": -27.199,
+          "interval_pp": [
+            -50.752,
+            -6.887
+          ],
+          "per_seed_mean_pp": {
+            "71": -0.694,
+            "73": -100.0,
+            "79": -42.361,
+            "83": 0.0,
+            "89": 0.0,
+            "97": -81.944,
+            "101": -2.083,
+            "103": 0.0,
+            "107": -100.0,
+            "109": -0.694,
+            "113": 0.0,
+            "127": 1.389
+          }
+        }
+      }
+    }
+  },
+  "crosscheck_max_diff": 0.0
+}

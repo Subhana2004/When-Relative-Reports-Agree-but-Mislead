@@ -1,0 +1,300 @@
+\documentclass[10pt]{article}
+\usepackage{tmlr}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs,array,multirow}
+\usepackage{microtype}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\xor}{\mathbin{\oplus}}
+\newcommand{\CQA}{\mathrm{CQA}}
+\newcommand{\E}{\mathbb{E}}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+\title{When Relative Reports Agree but Mislead:\\
+Identifiability and Optimization in Weakly Supervised Graph Reachability}
+% TMLR default submission mode hides authors. No name, affiliation or email stored here.
+\author{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+A reachability label can be easy to compute from a graph and still be difficult to learn from incomplete supervision. We study a controlled setting in which a recurrent graph network receives one verified answer and six potentially faulty binary relations among four counterfactual reachability questions. The reports have stated error rates, and a second setting introduces coherent errors that violate those reliability assumptions. We first establish a simple but consequential limitation: flipping every report incident to the verified anchor preserves all cycle-parity syndromes. This is a known gauge symmetry, here used to expose a diagnostic blind spot. Across 128 synthetic graph quadruples and 4,096 noisy report draws per noise regime, probability-sensitive label models improve reconstruction or probabilistic scoring, but those improvements need not survive downstream neural training. A larger neural comparison uses 12 new training seeds and 5 independently generated held-out graph draws per seed. Under independent noise, joint marginal training changes complete-quadruple accuracy by -15.8 percentage points relative to Bayesian posterior-mean targets (two-way resampling interval $[-39.8,\,+2.8]$). Under correlated noise, a model-matched mixture comparison changes accuracy by -3.1 points (interval $[-22.6,\,+9.9]$). The results reveal material seed sensitivity rather than a dependable advantage for the joint objective. We additionally compare algorithm-level implementations of spectral synchronization and Dawid--Skene inference, and evaluate on independently drawn random-tree topologies, while distinguishing these adaptations from full published-system reproductions. The contribution is a reproducible stress test of how uncertain relational evidence, label-model quality, and graph-learning dynamics come apart---not a claim to have invented latent-variable marginalization or surpassed published systems.
+\end{abstract}
+
+\section{Introduction}
+Consider four questions about whether one vertex can reach another in two related directed graphs. Only one answer has been verified. The remaining evidence consists of reports that two answers agree or disagree. If those reports were exact, the missing labels could be reconstructed algebraically. When they are fallible, the learning problem changes: an inferred label can be wrong even when the reports are mutually consistent, and a neural predictor may learn poorly even when the inferred labels are more accurate on average.
+
+These two failures are often conflated. Label aggregation asks which answers are plausible given the reports. Neural algorithmic reasoning asks whether a learned predictor can answer new source--target questions on graphs it has not seen. The first may improve while the second deteriorates. Our question is therefore not whether a more elaborate loss can produce a higher peak score; it is whether a learning advantage persists when report noise, model initialization, and test-graph draws are varied independently enough to expose fragile conclusions.
+
+We use a particularly interpretable task: directed reachability under a degree-preserving edge intervention. Ground truth is computable by breadth-first search, which lets us evaluate noisy supervision without disputing the labels. The controlled task is not offered as a practical replacement for graph search. Its purpose is to separate three sources of uncertainty: noise in relational reports, uncertainty in latent label reconstruction, and variation in the trained graph network.
+
+The study makes three bounded contributions. First, it provides an explicit gauge-symmetry counterexample showing why cycle-parity checks cannot detect a family of coordinated relation corruptions; the algebra applies independently of the graph architecture. Second, it contrasts reconstruction accuracy and proper-score performance on repeated noisy reports from multiple graph generators. Third, it evaluates matched downstream neural objectives across more training seeds and distinct graph draws than a single fixed-holdout comparison. The lesson is primarily methodological: an impressive average score can arise from a small number of dramatic optimization rescues and does not by itself imply a better reasoning procedure.
+
+\section{Related work and scope}
+Weak-supervision systems commonly build a probabilistic account of noisy sources before fitting an end model. Snorkel illustrates label-model aggregation \cite{Ratner2017}, while Dawid and Skene's expectation-maximization framework estimates error rates without directly observing every true label \cite{DawidSkene1979}. WRENCH documents how weak-supervision comparisons can vary with datasets, source definitions, and evaluation protocols \cite{Zhang2021Wrench}. More direct end-model approaches have also been studied, including end-to-end weak supervision \cite{Cachay2021} and optimization with weak-labeler constraints \cite{Agrawal2025}. Consequently, marginalizing latent labels inside a neural objective is not presented as a new general learning principle.
+
+The parity relations in our setting also resemble binary group synchronization: hidden signs are inferred from noisy relative signs. Cycle-edge reasoning and its robustness limitations are established in that literature \cite{LermanShi2022}. For graph networks, intermediate-state supervision of classical algorithms is a well-established neural algorithmic reasoning strategy \cite{Velickovic2020}. We include an explicitly additional-information trace-supervised control to distinguish what the chosen neural backbone can learn when full execution states are available.
+
+\emph{Baseline provenance matters.} Our exact posterior models are analytical methods under the declared observation process; a small EM parity model adapts the latent-confusion-matrix principle of \cite{DawidSkene1979} to pairwise reports. The intermediate-state model follows the broad idea of \cite{Velickovic2020}. Neither is claimed as a faithful reproduction of those papers' software or benchmark protocol. In particular, we have \emph{not} reproduced WEASEL or the full algorithms of \cite{Agrawal2025}; direct reproduction remains important future work.
+
+\section{Problem setting}
+A graph quadruple consists of two directed graphs $G_0,G_1$ and two source--target queries $q_a,q_b$. The corresponding truth vector is
+\begin{equation}
+\mathbf y=\bigl(y(G_0,q_a),y(G_0,q_b),y(G_1,q_a),y(G_1,q_b)\bigr)\in\{0,1\}^4.
+\end{equation}
+Each entry is one exactly when a directed path exists from source to target. The graph pair is generated by a matched edge switch that preserves every vertex's incoming and outgoing degree. Instances contain directed cycles, local shortcuts, and one to three crossing bridges, depending on the generator family. We randomly permute the query order for each training observation so that the first position is not invariably the positive class.
+
+For a particular ordering, only the first label $y_0=a$ is revealed. The six unordered pairs $E=\{(i,j):0\leq i<j\leq 3\}$ yield true parity bits $y_i\xor y_j$. The model instead observes noisy bits $r_{ij}$ and declared error probabilities $\epsilon_{ij}$. Under independent noise, every report flips with its own probability. Under the correlated process, an additional event complements the three reports adjacent to label 0 but leaves their advertised reliabilities unchanged. The graph predictor is asked to produce $p_{\theta,i}=P_\theta(y_i=1\mid G,q)$ for each query, with a shared parameter set $\theta$.
+
+\subsection{A limit of cycle-syndrome diagnostics}
+\begin{proposition}[Gauge invariance of parity cycles]
+For any observed report array $r$ on an undirected comparison graph, and any binary mask $s$ on its vertices, define $r'_{ij}=r_{ij}\xor s_i\xor s_j$. For every cycle $C$, the XOR of reports around $C$ is unchanged. In particular, taking $s_0=0$ and $s_1=s_2=s_3=1$ preserves the anchor while complementing all three anchor-incident reports.
+\end{proposition}
+\begin{proof}
+Along a cycle, each mask bit $s_i$ appears on precisely two incident edges. Binary XOR cancels duplicate terms, leaving $\bigoplus_{(i,j)\in C}r'_{ij}=\bigoplus_{(i,j)\in C}r_{ij}$. The chosen mask fixes the anchor and transforms every nonanchor label in an alternative assignment $\mathbf y'=\mathbf y\xor\mathbf s$. The transformed reports are thus mutually as cycle-consistent as the originals.
+\end{proof}
+
+This is an algebraic observation about \emph{relative reports}, not a claim that graph reachability itself is impossible to identify. The graph is observed, and exact graph traversal can disambiguate the true endpoint answers. The proposition says something narrower: tests using only triangle or cycle parities cannot distinguish the original reports from a coherent anchor-fan transformation. Figure~\ref{fig:gauge} illustrates the ambiguity. Our generator audit instantiates it on 256 verified quadruples covering 4 structural families and four graph sizes; the theorem does not depend on the test count.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.89\linewidth]{gauge.pdf}
+  \caption{A parity-report transformation invisible to every cycle XOR syndrome. The nodes are \emph{query labels}, not the vertices of the reachability graph. Numbers on edges indicate reported same/different bits.}
+  \label{fig:gauge}
+\end{figure}
+
+\section{Training objectives and controls}
+A common gated recurrent graph network takes as input the directed adjacency matrix, a source indicator, a target index, and an unroll count. It uses 16 hidden coordinates and 13 propagation steps during training. At evaluation, unrolling extends to $n+2$ steps for a component of size $n$. All weak-supervision arms have the same architecture and optimizer; differences are in their training targets or losses.
+
+For each anchor-consistent latent assignment $\mathbf y$ there is a report likelihood under the assumed noise model. Let $q_\eta(\mathbf y\mid r,a)$ denote the normalized posterior over the eight assignments with $y_0=a$. The strong standard model first computes posterior means $m_i=\E_{q_\eta}[y_i]$ and minimizes soft-label binary cross-entropy on the graph predictions, plus the exact anchor target. For correlated errors, the robust soft-label control uses an 80/20 mixture between independent reports and an anchor-fan-corrupted observation process.
+
+The candidate joint objective does not reduce the posterior to four means before fitting the network. Instead it minimizes
+\begin{equation}
+\mathcal L_{\mathrm{joint}}(\theta)
+=\mathcal L_{\mathrm{anchor}}
+-\log\!\sum_{\mathbf y:y_0=a}q_\eta(\mathbf y\mid r,a)
+  \prod_{i=1}^{3}p_{\theta,i}^{y_i}(1-p_{\theta,i})^{1-y_i}.
+\label{eq:joint}
+\end{equation}
+The robust joint version uses the \emph{same} fixed mixture prior and per-report reliabilities as the robust soft-label control. This matched comparison matters: giving a method a correlation-aware observation model while denying it to the baseline would confound model assumptions with learning objectives.
+
+One reason Equation~\ref{eq:joint} can behave differently from soft-label training is Jensen's inequality:
+\begin{equation}
+-\log\E_{q_\eta}[P_\theta(\mathbf y)]\leq
+\E_{q_\eta}[-\log P_\theta(\mathbf y)].
+\label{eq:jensen}
+\end{equation}
+For a multimodal posterior, the left-hand side may be reduced by placing substantial mass on one plausible assignment rather than representing all assignments with calibrated independent marginals. This is a mechanism for instability, not a proof that the joint method must fail.
+
+\subsection{Comparators and what each can establish}
+\begin{itemize}
+\item \textbf{Anchor-only:} fits only one verified label in each quadruple. This tests how much the network can learn from the graph input alone.
+\item \textbf{Unweighted MAP:} enumerates the eight assignments, assumes a common report-error rate, selects the maximum-posterior assignment, and trains on hard labels.
+\item \textbf{EM parity labels:} fits six shared report-channel error probabilities by an EM procedure with a Beta$(2,8)$ regularizer, then trains on posterior-mean labels. This is a newly implemented \emph{Dawid--Skene-style adaptation}, not a published system reproduction. It does not receive the per-example reliability tags.
+\item \textbf{Independent and mixture Bayesian soft labels:} exact posterior-mean targets using the model's provided reliabilities; the mixture arm shares the candidate's correlation prior.
+\item \textbf{Joint independent and mixture likelihoods:} Equation~\ref{eq:joint} under the corresponding observation model.
+\item \textbf{Oracle endpoint labels and BFS:} the former supervises all four correct endpoints; the latter computes exact reachability. Both receive information or computation not available to the weak-label methods, so they are not fair same-information challengers.
+\item \textbf{Intermediate-state neural execution:} fits every BFS-reachable-node state at each training propagation step, along with endpoints. This follows a broad learning-with-traces approach, but uses additional oracle traces and a different loss; it is an upper control for learnability rather than a competitive weak-supervision baseline.
+\end{itemize}
+
+\section{Experimental protocol}
+The training collection contains 24 certified quadruples, using components of sizes 10 and 12 from two families (\texttt{chain\_scc} and \texttt{layered}). Test quadruples come from the held-out \texttt{branch} and \texttt{dense\_scc} families with component sizes 22, 34, and 48. For each of 12 distinct model/report seeds, we train each arm once and evaluate it on five independently generated graph draws of 24 quadruples each. The same test draws are used across methods, enabling paired contrasts; the train/test component sizes and named structural families are disjoint. This is a structural shift within one synthetic generator framework, not an evaluation on naturally occurring networks.
+
+The heavy-noise condition assigns each relation an error rate of either $0.16$ or $0.46$ and flips reports independently. The correlated condition assigns rates of $0.06$ or $0.30$, with probability $0.28$ of a further anchor-fan flip; the declared reliabilities do not incorporate that event. The correlation-aware models assume event probability $0.20$, deliberately leaving a mismatch between model and simulator. Per-report reliability tags are shared within the matched Bayesian-soft versus joint comparisons.
+
+All weakly supervised arms use six epochs, AdamW with learning rate $0.003$, gradient clipping at one, and 144 optimizer updates, corresponding to 576 graph-network forwards during training. Their initial neural weights are identical within a seed. The EM step and eight-state marginal likelihood add computation not represented by the graph-forward count; total FLOPs and wall-clock costs therefore remain different. Graph oracles are used for dataset verification and evaluation, not to supply hidden endpoint labels to weakly supervised losses. The oracle and trace controls explicitly receive additional truth information.
+
+The primary outcome is \emph{complete-quadruple accuracy} (CQA): one score for each group of four questions, equal to one only if all answers are correct. This prevents a predictor that always emits the same class from appearing moderately successful on the balanced quadruples. We retain per-seed and per-draw outcomes in the research archive. Two prespecified \emph{within-this-extension} comparisons are joint versus independent soft labels under heavy noise, and mixture joint versus mixture soft labels under correlated noise. Since model development and related pilot outcomes were inspected before this extension, none of the results should be interpreted as an externally preregistered confirmation.
+
+\paragraph{Uncertainty calculation.} For each paired contrast, we form a $12\times 5$ matrix of differences: each row shares the training seed and each column shares the graph draw. A two-way percentile bootstrap resamples rows and columns separately, retaining pairing between methods. We also compute the distribution of seed-averaged differences and an exact sign-flip sensitivity calculation. These are exploratory summaries: five graph-draw clusters are too few to generalize to natural graph populations, and the seed also controls the weak-report draws, not neural initialization alone.
+
+\section{Results}
+\subsection{Report reconstruction and probability scoring}
+A model-free comparison used 128 verified graph quadruples from four generator families and four sizes, with 32 independent noisy-report draws per quadruple per regime. Table~\ref{tab:decode} separates complete-label-set recovery from Brier score, the mean squared error of estimated label probabilities. The two metrics need not move together.
+
+\begin{table}[h]
+\centering\small
+\caption{Model-free reconstruction across 4,096 noisy-report observations per regime. CQA is complete-set recovery after thresholding probabilities. Lower Brier is better.}
+\label{tab:decode}
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{Heavy independent} & \multicolumn{2}{c}{Correlated}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Method & CQA (\%) & Brier & CQA (\%) & Brier\\
+\midrule
+Tree completion & 32.23 & .263 & 39.62 & .284 \\
+Unweighted MAP & 39.50 & .253 & 51.54 & .269 \\
+Weighted MAP & 50.27 & .206 & 55.86 & .256 \\
+Independent posterior mean & 50.05 & .129 & 55.22 & .206 \\
+Mixture posterior mean & 50.05 & .139 & 55.22 & .169 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The mixture-aware posterior mean gives \emph{exactly the same} thresholded CQA as the independent posterior mean in this sample, but under correlated noise its Brier score falls from $0.206$ to $0.169$. Thus, accounting for correlated errors can improve probabilistic predictions under a proper scoring rule without changing hard classifications. A Brier improvement alone does not separately establish better calibration. Under independent noise, the misspecified mixture model instead has a worse Brier score, as expected when an unnecessary corruption mode is introduced. Figure~\ref{fig:brier} shows the comparison without collapsing the two regimes into one average.
+
+\begin{figure}[h]
+\centering\includegraphics[width=.94\linewidth]{decoder_brier.pdf}
+\caption{Model-free label probabilities evaluated against exact reachability labels. Reliable probability estimates are not the same as reliable learned neural generalization.}
+\label{fig:brier}
+\end{figure}
+
+\subsection{Neural reasoning across seeds and test draws}
+Table~\ref{tab:neural} reports the average CQA over 12 model/report seeds and 5 graph draws; each seed is evaluated on 120 quadruples. An exact BFS reference obtains 100\% on the same graphs by construction, but it is not a learned network.
+
+\begin{table}[h]
+\centering\small
+\caption{Held-out graph CQA. Entries are means across training seeds and independently regenerated graph draws, not the best seed. A dash means the arm was not run in that regime.}
+\label{tab:neural}
+\begin{tabular}{lcc}
+\toprule
+Training arm & Heavy noise & Correlated noise\\
+\midrule
+Anchor only & 50.0\% & -- \\
+Unweighted MAP & 80.3\% & 61.8\% \\
+EM parity pseudo-labels & 93.8\% & 64.6\% \\
+Bayesian soft labels & 84.7\% & 82.2\% \\
+Mixture Bayesian soft labels & -- & 88.5\% \\
+Joint marginalization & 68.9\% & 67.3\% \\
+Mixture joint marginalization & -- & 85.4\% \\
+Oracle endpoint labels & 93.2\% & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+  \centering\includegraphics[width=.92\linewidth]{neural_baselines.pdf}
+  \caption{Downstream CQA averaged over the completed experiment. The oracle control uses four exact endpoint labels, rather than one anchor and uncertain parity relations.}
+  \label{fig:baselines}
+\end{figure}
+
+The directly matched heavy-noise contrast, joint minus independent-soft, is -15.8 percentage points with a two-way bootstrap interval $[-39.8,\,+2.8]$ and an exploratory exact paired sign-randomization $p$ value of 0.3438. The matched correlated-noise contrast, mixture-joint minus mixture-soft, is -3.1 points with interval $[-22.6,\,+9.9]$ and $p=0.9609$. The counts of seed-averaged wins, ties, and losses are (wins=3, ties=5, losses=4) and (wins=6, ties=3, losses=3) respectively. Because the study is exploratory, intervals and $p$ values should not be rebranded as confirmatory hypothesis tests.
+
+\begin{figure}[h]
+  \centering\includegraphics[width=.95\linewidth]{seed_diffs.pdf}
+  \caption{Seed-averaged paired CQA differences, each already averaged over five graph draws. A positive value favors joint learning; a negative value favors posterior-soft-label training.}
+  \label{fig:seeds}
+\end{figure}
+
+The range of mean differences after omitting any single training seed (one at a time, without altering reported sample membership) is $[-17.8,\,-8.1]$ points for heavy noise and $[-5.3,\,+5.8]$ points for correlated noise. A substantial shift under a one-seed omission is a warning that the headline mean is not a robust method ranking. Figures~\ref{fig:baselines} and \ref{fig:seeds} are presented together for this reason: averages describe the test sample; paired seed differences diagnose whether they arise consistently.
+
+For interpretability, an additional-information neural-execution control was trained with exact per-step BFS traces for three seeds. It attained mean CQA 97.8\% (seed values: 71: 93.3\%, 79: 100.0\%, 89: 100.0\%). Its data budget is not comparable with the weak-label learners: intermediate states provide much denser supervision. Together with the oracle endpoint control, it shows that failures of weakly supervised learners are not simply proofs that the graph-to-answer mapping is unlearnable.
+
+\subsection{Correlated errors and graph-family audit}
+The gauge transformation preserved every triangle XOR syndrome in 256 checked graph quadruples drawn from 4 families and sizes 10, 14, 22, and 34, with effect-preserving and effect-changing interventions both included. This empirical audit verifies that the implementation realizes the algebraic counterexample across structural variants. It does not convert the underlying group-symmetry identity into a new theorem about directed reachability. Crucially, the phenomenon is an ambiguity in the \emph{reported parity network}, not in the graph adjacency; BFS still supplies the true endpoint answers.
+
+\subsection{Seed-level differences}
+The individual seed means below are computed across all five held-out graph draws. Each entry is joint minus its matched posterior-soft-label comparator in percentage points. Keeping negative results visible is essential because the paired means can hide one-class collapse.
+\begin{table}[h]
+\centering\small
+\caption{Paired complete-quadruple accuracy differences by training seed (percentage points).}
+\begin{tabular}{rrr}\toprule
+Seed & Heavy noise & Correlated noise\\ \midrule
+71 & +0.0 & +0.8 \\
+73 & +0.0 & +0.0 \\
+79 & +3.3 & +21.7 \\
+83 & -6.7 & +10.0 \\
+89 & +2.5 & +0.0 \\
+97 & +0.0 & -6.7 \\
+101 & +6.7 & +15.8 \\
+103 & +0.0 & +5.0 \\
+107 & -1.7 & +0.0 \\
+109 & -100.0 & -100.0 \\
+113 & +0.0 & -2.5 \\
+127 & -93.3 & +19.2 \\
+\bottomrule\end{tabular}
+\end{table}
+
+
+\section{Algorithm-level baselines and independent topology stress test}
+\label{sec:published}
+
+\subsection{Published estimators, adapted explicitly}
+To test whether the reported effects are peculiar to our internal inference routines, we implemented two established estimators on the same six parity reports. First, the leading-eigenvector method of \citet{Singer2011} is specialized to binary $\mathbb Z_2$ synchronization: construct a symmetric signed matrix $H_{ij}=w_{ij}(-1)^{r_{ij}}$ for $i\ne j$, take its top eigenvector, and fix the global sign from the observed anchor. We used $w_{ij}=\log[(1-\epsilon_{ij})/\epsilon_{ij}]$, a specified confidence-weighted adaptation. Second, we fitted the two-class confusion-matrix expectation--maximization estimator of \citet{DawidSkene1979}. To apply it to relational rather than per-query reports, three labeler votes per nonanchor variable were obtained from the direct anchor edge and the two length-two paths through the other labels. Those three votes share parity edges and therefore \emph{violate the conditional-independence assumption} of Dawid--Skene. We used both a mildly regularized EM implementation and a no-abstention, two-class reimplementation of the E/M updates, majority-vote initialization, and unsmoothed defaults of the WRENCH Dawid--Skene implementation (upstream source revision recorded in the archive).
+
+These baselines reproduce published \emph{mathematical estimators} on task-adapted inputs. They are not a claim to have run the upstream packages on their original datasets or to have reproduced their reported results. In particular, the study still lacks a faithful end-to-end WEASEL reproduction or the full algorithm of \citet{Agrawal2025}. The label-model methods also differ in what information they receive: weighted spectral and MAP estimators use declared per-report error probabilities; Dawid--Skene instead learns source confusion from unlabeled votes.
+
+\begin{table}[H]
+\centering\small
+\caption{Out-of-training-graph label-set reconstruction. Each regime has 128 held-out graph quadruples with eight independent report draws each. CQA counts all four labels correct; Brier is averaged over query probabilities. Adapted estimators were fitted without evaluation truths.}
+\label{tab:published_label}
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{2}{c}{Heavy independent} & \multicolumn{2}{c}{Correlated} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Method & CQA (\%) & Brier & CQA (\%) & Brier \\
+\midrule
+Tree completion & 31.9 & 0.262 & 39.3 & 0.289 \\
+Unweighted MAP & 39.3 & 0.250 & 50.3 & 0.270 \\
+Weighted MAP & 48.0 & 0.210 & 54.9 & 0.252 \\
+Spectral $\mathbb{Z}_2$ sync. & 48.0 & 0.207 & 55.1 & 0.248 \\
+Dawid--Skene EM (reg.) & 37.0 & 0.162 & 44.9 & 0.210 \\
+WRENCH-style EM & 0.0 & 0.344 & 44.9 & 0.211 \\
+Bayesian posterior mean & 46.9 & 0.130 & 54.4 & 0.199 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The weighted spectral estimator and exact weighted MAP yield almost the same reconstruction rates on this four-label problem. This is not a claim that spectral relaxation is generally equivalent to MAP. The Dawid--Skene variants fare worse on the deliberately dependent path votes; in the heavy-noise setting the unsmoothed WRENCH-style EM adaptation exhibits a degenerate fitted class distribution. We report this collapse rather than discarding a failed configuration. The published methods have distinct assumptions and supervision metadata, and these are methodological stress tests, not a leaderboard across equivalent information budgets.
+
+\subsection{A held-out random-tree-based graph generator}
+The preceding evaluation varies graph size and shortcut density but retains a chain-based scaffold. We therefore generated an additional holdout using four different rooted-tree constructions: random recursive attachment, preferential attachment, balanced branching, and layered random attachment. Within each side of a chosen tree cut, independent random directed edges introduce alternate local routes and cycles. A symmetric cross-copy edge switch preserves every named vertex's incoming and outgoing degree; exact directed reachability and graph isomorphism are checked on every generated pair. To avoid label leakage, the classifier is never trained on these graph draws. The held-out component sizes are 22, 34, and 48, with three independent draw seeds and 48 quadruples per draw. These are \emph{new synthetic topologies}, not naturally occurring networks or an external public benchmark. They still share the original two-copy intervention construction and could retain shortcuts.
+
+The parity-cycle gauge audit also passed on all 144 additional quadruples across the four new graph families, both intervention-effect conditions, and three graph sizes. This confirms the new generator instantiates the same algebraic symmetry; it is not an additional theorem.
+
+\begin{table}[H]
+\centering\small
+\caption{Downstream neural CQA with 12 seeds and matched training budgets. Original held-out test: five draws of 24 quadruples; independent random-tree test: three draws of 48 quadruples. Scores are means over all seed--draw pairs.}
+\label{tab:toposhift}
+\begin{tabular}{llrr}
+\toprule
+Noise & Weak-label training arm & Original test (\%) & New topology (\%) \\
+\midrule
+Heavy & Posterior soft & 84.7 & 85.9 \\
+ & Joint likelihood & 68.9 & 71.6 \\
+ & Spectral pseudo-labels & 80.6 & 87.3 \\
+ & DS soft pseudo-labels & 32.7 & 35.9 \\
+Correlated & Mixture soft & 88.5 & 89.1 \\
+ & Mixture joint & 85.4 & 85.9 \\
+ & Spectral pseudo-labels & 70.9 & 78.8 \\
+ & DS soft pseudo-labels & 53.3 & 61.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On the new topology holdout, we preserve the same fixed initializations, weak-report draws, and number of neural optimizer updates in each comparison. We evaluate \emph{both} the previously reported inference strategies and the algorithm-level adaptations on the same graph draws. The methods do not have exactly equal total floating-point workloads, because label estimation requires different amounts of preprocessing. These tests can reject inflated generalization claims; they cannot establish performance on real systems.
+
+\paragraph{Paired contrasts on the random-tree holdout.}
+Under independent noise, spectral-derived labels outperform Bayesian soft labels by 1.4 percentage points on average, but the exploratory two-way interval ($[-1.3,+5.5]$ points) includes zero. Dawid--Skene soft labels underperform the same control by 50.1 points ($[-75.3,-24.9]$). With correlated noise, spectral pseudo-labels trail mixture-aware soft labels by 10.4 points ($[-29.7,+2.6]$), while Dawid--Skene trails by 27.2 points ($[-50.8,-6.9]$). We do not interpret these post-hoc intervals as a definitive population ranking.
+
+\paragraph{Provenance and reproducibility.} The package records the Singer 2011 paper and the exact upstream WRENCH source revision inspected for the Dawid--Skene updates, alongside the local adaptations, seed lists, raw paired predictions, and automated tests. No results here are attributed to an unexecuted upstream implementation. Full published-system reproduction on a comparable benchmark remains outstanding.
+
+\section{Discussion: what the evidence supports}
+Three observations stand out. First, there is no free diagnostic for coherent error: reports may be jointly corrupted yet pass the very parity-cycle checks meant to flag contradictions. A practical method would need an independent source of evidence---for example, a second verified endpoint or a trusted structural certificate---to break this ambiguity. Second, probabilistic scoring and discrete label recovery answer different questions. The mixture model's Brier improvement under correlated noise did not change its reconstruction CQA on the sampled reports; this is a property of the predictions, not a claim that calibration was measured in isolation. Third, downstream neural behavior introduces an additional layer of instability. A loss that is more faithful to the latent-label posterior is not guaranteed to train the shared graph architecture more reliably.
+
+The third point limits claims about Equation~\ref{eq:joint}. A favorable mean does not establish a superior algorithm if a few seeds account for the difference, and the marginal-likelihood principle has direct precedents in latent-variable learning. The more credible contribution here is the documented mismatch between label-model quality and neural generalization under deliberately controlled relational noise.
+
+\paragraph{Why this is not a practical reachability solver.} Graph traversal already returns exact reachability labels cheaply in this synthetic setting. WITNESS does not demonstrate cheaper annotations or stronger runtime performance than BFS. Its intended research utility is as a small, falsifiable test bed where the gap between weak supervision and learned reasoning can be measured unambiguously. Substantial work would be required to establish value in settings where oracle graph traversal is unavailable, costly, or itself uncertain.
+
+\paragraph{Remaining methodological gaps.} The graph generator always constructs two related backbone copies and balances answer patterns. Although train and test differ in named families and sizes, they share that high-level design, creating the possibility of structural shortcuts and overestimated out-of-distribution performance. No natural graph data have been tested. The additional random-tree-based test changes the topology generator but retains the same mirrored-copy intervention mechanism. Although we added precise algorithm-level adaptations of spectral synchronization and Dawid--Skene EM, the comparison does not include faithful executions of full published WEASEL or constraint-learning systems. Our neural and trace controls are documented task-specific adaptations. Training seeds also determine sampled weak observations, and five graph draws do not represent a broad population. A more decisive study would add external graph benchmarks, cost-matched published end-model baselines, independently varied training-set draws, and a preregistered evaluation protocol.
+
+\section{Conclusion}
+In a directed reachability study with one verified label and noisy pairwise relations, it is possible to improve uncertainty estimates without improving the decisions obtained from them, and to improve a latent-label training objective on average without obtaining dependable gains across neural initializations. A coherent anchor-fan corruption is invisible to cycle-parity diagnostics, but that algebraic limitation must be distinguished from what can be learned from the observed graph itself. Rather than offering a new state-of-the-art reasoner, this work documents a testable failure mode and an evaluation protocol for claims about uncertain relational supervision. The additional published-estimator adaptations and synthetic-topology shift reveal failure cases but do not establish an end-to-end learning advantage. The immediate scientific priority is independently informative evidence that can break the gauge ambiguity and external, published-system evaluations on natural graph tasks.
+
+\section*{Reproducibility and responsibility}
+The companion archive contains the graph generator, per-seed neural outcomes, per-draw correctness, exact reachability audits, binary report-corruption protocol, deterministic random seeds, analysis scripts, and executable tests. All claimed empirical numbers above are derived from the included outputs. No private datasets or human subjects were used. The author(s) remain responsible for independent verification of analyses, citations, and research claims before submission.
+
+\begin{thebibliography}{10}
+\bibitem[Agrawal et~al.(2025)]{Agrawal2025} V. Agrawal, R. Pukdee, N. Balcan, and P. K. Ravikumar. Learning from weak labelers as constraints. \emph{ICLR}, 2025. \url{https://proceedings.iclr.cc/paper_files/paper/2025/hash/e91fb65c6324a984ea9ef39a5b84af04-Abstract-Conference.html}.
+\bibitem[R\"uhling Cachay et~al.(2021)]{Cachay2021} S. R\"uhling Cachay, B. Boecking, and A. Dubrawski. End-to-end weak supervision. \emph{Advances in Neural Information Processing Systems}, 34, 2021. \url{https://proceedings.neurips.cc/paper_files/paper/2021/hash/0e674a918ebca3f78bfe02e2f387689d-Abstract.html}.
+\bibitem[Dawid and Skene(1979)]{DawidSkene1979} A. P. Dawid and A. M. Skene. Maximum likelihood estimation of observer error-rates using the EM algorithm. \emph{Journal of the Royal Statistical Society: Series C}, 28(1):20--28, 1979. \href{https://doi.org/10.2307/2346806}{doi:10.2307/2346806}.
+\bibitem[Lerman and Shi(2022)]{LermanShi2022} G. Lerman and Y. Shi. Robust group synchronization via cycle-edge message passing. \emph{Foundations of Computational Mathematics}, 22:1665--1741, 2022. \href{https://doi.org/10.1007/s10208-021-09532-w}{doi:10.1007/s10208-021-09532-w}.
+\bibitem[Ratner et~al.(2017)]{Ratner2017} A. Ratner, S. H. Bach, H. Ehrenberg, J. Fries, S. Wu, and C. R\'e. Snorkel: Rapid training data creation with weak supervision. \emph{Proceedings of the VLDB Endowment}, 11(3):269--282, 2017. \href{https://doi.org/10.14778/3157794.3157797}{doi:10.14778/3157794.3157797}.
+\bibitem[Veli\v{c}kovi\'c et~al.(2020)]{Velickovic2020} P. Veli\v{c}kovi\'c, R. Ying, M. Padovano, R. Hadsell, and C. Blundell. Neural execution of graph algorithms. \emph{ICLR}, 2020. \url{https://research.google/pubs/neural-execution-of-graph-algorithms/}.
+\bibitem[Zhang et~al.(2021)]{Zhang2021Wrench} J. Zhang et al. WRENCH: A comprehensive benchmark for weak supervision. \emph{NeurIPS Datasets and Benchmarks}, 2021. \url{https://datasets-benchmarks-proceedings.neurips.cc/paper_files/paper/2021/hash/1c9ac0159c94d8d0cbedc973445af2da-Abstract-round2.html}.
+\bibitem[Singer(2011)]{Singer2011} A. Singer. Angular synchronization by eigenvectors and semidefinite programming. \emph{Applied and Computational Harmonic Analysis}, 30(1):20--36, 2011. \href{https://doi.org/10.1016/j.acha.2010.02.001}{doi:10.1016/j.acha.2010.02.001}.
+\end{thebibliography}
+\end{document}

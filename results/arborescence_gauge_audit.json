@@ -1,0 +1,20 @@
+{
+  "cases": 144,
+  "families": [
+    "balanced_branch",
+    "layered_random",
+    "preferential",
+    "random_recursive"
+  ],
+  "sizes": [
+    22,
+    34,
+    48
+  ],
+  "effects": [
+    0,
+    1
+  ],
+  "cycle_syndrome_preserved": true,
+  "note": "algebraic parity-report invariance, not graph indistinguishability"
+}

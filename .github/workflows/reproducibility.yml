@@ -1,0 +1,43 @@
+name: Reproducibility (archived validated package)
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-reanalyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout source and results
+        uses: actions/checkout@v4
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Check release artifact SHA-256
+        run: sha256sum -c reproducibility/CHECKSUMS.sha256
+      - name: Extract pinned experiment
+        run: |
+          mkdir -p extracted
+          unzip -q reproducibility/WITNESS_TMLR_Validated_Supplement.zip -d extracted
+      - name: Run packaged checks and tests
+        working-directory: extracted/WITNESS_TMLR_Validated_Supplement
+        run: |
+          export PYTHONPATH=.:WITNESS_TMLR_Anonymized_Supplement
+          python -m pytest -q
+          sha256sum results/summary.json > /tmp/summary_before.sha256
+          python analyze_validation.py
+          sha256sum results/summary.json > /tmp/summary_after.sha256
+          diff -u /tmp/summary_before.sha256 /tmp/summary_after.sha256
+      - name: Verify browseable source tests
+        run: |
+          export PYTHONPATH=.:WITNESS_TMLR_Anonymized_Supplement
+          python -m pytest -q test_published_validation.py WITNESS_TMLR_Anonymized_Supplement/experiments/test_method.py WITNESS_TMLR_Anonymized_Supplement/tests
