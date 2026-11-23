@@ -1,0 +1,47 @@
+{
+  "protocol": {
+    "per_quadruple_report_draws": 16,
+    "original_graphs": 24,
+    "nonmirrored_graphs": 24,
+    "forced_anchor_fan": "all three anchor-incident relation bits flipped as a paired perturbation",
+    "cycle_syndrome": "triangle XOR values before and after fan; no model training",
+    "extra_anchor": "independent exact label for observed position 1; additional-information control",
+    "meaning": "diagnostic consequence of known gauge invariance; not a novel theorem"
+  },
+  "results": {
+    "mirrored_original": {
+      "cases": 384,
+      "same_syndrome": 384,
+      "base_correct": 286,
+      "fan_correct": 17,
+      "fan_plus_extra_anchor_correct": 116,
+      "wrong_fan_with_low_syndrome": 118,
+      "fan_total_brier": 212.111241839839,
+      "base_total_brier": 27.046112578869312,
+      "extra_total_brier": 72.95378200538326,
+      "base_cqa": 0.7447916666666666,
+      "fan_cqa": 0.044270833333333336,
+      "fan_extra_anchor_cqa": 0.3020833333333333,
+      "base_brier": 0.0704325848408055,
+      "fan_brier": 0.5523730256245808,
+      "extra_brier": 0.18998380730568556
+    },
+    "nonmirrored_asymmetric": {
+      "cases": 384,
+      "same_syndrome": 384,
+      "base_correct": 286,
+      "fan_correct": 17,
+      "fan_plus_extra_anchor_correct": 117,
+      "wrong_fan_with_low_syndrome": 118,
+      "fan_total_brier": 212.111241839839,
+      "base_total_brier": 27.046112578869305,
+      "extra_total_brier": 72.95378200538326,
+      "base_cqa": 0.7447916666666666,
+      "fan_cqa": 0.044270833333333336,
+      "fan_extra_anchor_cqa": 0.3046875,
+      "base_brier": 0.07043258484080549,
+      "fan_brier": 0.5523730256245808,
+      "extra_brier": 0.18998380730568556
+    }
+  }
+}

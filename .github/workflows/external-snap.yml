@@ -1,0 +1,44 @@
+name: External directed SNAP feasibility audit
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'snap_external_audit.js'
+      - '.github/workflows/external-snap.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve source (prefer official SNAP archive)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if curl --fail --location --retry 2 --connect-timeout 12 --max-time 90 \
+             https://snap.stanford.edu/data/p2p-Gnutella08.txt.gz -o network.txt.gz; then
+            gzip -dc network.txt.gz > network.txt
+            echo 'Dataset: official SNAP archive' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Official download unavailable: using pinned public copy, not asserting byte equality to official archive'
+            curl --fail --location --retry 2 --max-time 90 \
+              https://raw.githubusercontent.com/aaziy/Graph-Algorithms/main/p2p-Gnutella08.txt -o network.txt
+            actual="$(git hash-object network.txt)"
+            test "$actual" = 'f6d6ea2941ef6c892abe5be37a6b48c403d8c0f3'
+            echo 'Dataset: pinned GitHub mirror (blob hash verified)' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          sha256sum network.txt | tee source_sha256.txt
+      - name: Compute audited real-network graph interventions
+        run: |
+          node snap_external_audit.js network.txt | tee snap_external_result.json
+          node -e "const x=require('./snap_external_result.json'); if(x.original_vertices!==6301||x.original_edges!==20777||x.valid_swaps+x.failed_swaps!==512)process.exit(2)"
+      - name: Preserve source provenance and outputs (not the dataset)
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-snap-audit
+          path: |
+            snap_external_result.json
+            source_sha256.txt
+          retention-days: 30
