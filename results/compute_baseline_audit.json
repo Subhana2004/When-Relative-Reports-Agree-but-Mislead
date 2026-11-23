@@ -1,0 +1,82 @@
+{
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "torch": "2.10.0+cpu",
+  "numpy": "2.3.5",
+  "pytorch_threads": 1,
+  "n_training_quadruples": 24,
+  "caveats": "Timings of distinct operations NOT equal FLOP measurements, machine-dependent and not a model-end-to-end comparison. No natural-network benchmarks executed by this audit.",
+  "methods": {
+    "spectral_synchronization": {
+      "published_family": "Singer, Angular Synchronization by Eigenvectors and Semidefinite Programming, 2011",
+      "implementation": "custom Z2 spectral specialization",
+      "inputs": "six parity bits, six reliability tags, one anchor",
+      "relative_cost": "4x4 symmetric eigendecomposition; O(4^3) algebra",
+      "original_upstream_implementation_executed": false
+    },
+    "dawid_skene_regularized": {
+      "published_family": "Dawid & Skene, JRSS-C 1979",
+      "implementation": "WITNESS-adapted confusion-matrix EM",
+      "inputs": "3 votes per nonanchor query, obtained from overlapping parity paths; no reliability tags",
+      "relative_cost": "iterative EM, approximately O(T * N * 3 * 2^2)",
+      "original_upstream_implementation_executed": false
+    },
+    "wrench_style_ds_unsmoothed": {
+      "published_family": "WRENCH implementation of Dawid-Skene, Zhang et al., NeurIPS 2021",
+      "implementation": "local specialization of source, not original import",
+      "inputs": "same dependent path votes",
+      "relative_cost": "iterative EM, no per-report reliability metadata",
+      "original_upstream_implementation_executed": false,
+      "upstream_blob_sha": "7c59cf863f2630c6d9cc89939acb0c5be049e2f9"
+    },
+    "posterior_soft": {
+      "published_family": "exact Bayesian inference on binary constraints",
+      "implementation": "8-state exact enumeration under supplied independent noise model",
+      "inputs": "six bits, six reliability tags, one anchor",
+      "relative_cost": "2^(4-1)*6 likelihood evaluations plus normalization",
+      "original_upstream_implementation_executed": null
+    },
+    "joint": {
+      "published_family": "marginal latent-label likelihood",
+      "implementation": "direct eight-state likelihood and autograd",
+      "inputs": "same reports, tags, anchor and graphs as matched posterior-soft",
+      "relative_cost": "above posterior arithmetic plus differentiable eight-state model loss",
+      "original_upstream_implementation_executed": null
+    }
+  },
+  "timings": {
+    "exact_posterior": {
+      "calls": 500,
+      "wall_seconds": 0.00748010899997098,
+      "process_cpu_seconds": 0.007478617999999937
+    },
+    "spectral_4x4": {
+      "calls": 500,
+      "wall_seconds": 0.009951530999842362,
+      "process_cpu_seconds": 0.009951636999999902
+    },
+    "joint_loss_and_autograd": {
+      "calls": 500,
+      "wall_seconds": 0.15179180599989195,
+      "process_cpu_seconds": 0.15154389299999949
+    },
+    "ds_regularized_fit": {
+      "calls": 1,
+      "wall_seconds": 0.055765663999864046,
+      "process_cpu_seconds": 0.055770097000000796,
+      "estimated_class_prior": [
+        0.42626457060498996,
+        0.5737354293950102
+      ]
+    },
+    "ds_wrench_style_fit": {
+      "calls": 1,
+      "wall_seconds": 0.38101749100019333,
+      "process_cpu_seconds": 0.3809847839999998,
+      "estimated_class_prior": [
+        0.41169354259054125,
+        0.588306457409459
+      ]
+    }
+  }
+}

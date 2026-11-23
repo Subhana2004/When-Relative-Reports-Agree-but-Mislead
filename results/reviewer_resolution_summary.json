@@ -1,0 +1,267 @@
+{
+  "factorial": {
+    "protocol": {
+      "status": "post-hoc factorial design, not preregistered",
+      "regime": "heavy",
+      "training_quadruple_sizes": [
+        24,
+        192
+      ],
+      "training_graph_seeds": [
+        314159,
+        271828,
+        161803,
+        577215
+      ],
+      "weak_report_seeds": [
+        9001,
+        9007
+      ],
+      "model_initialization_seeds": [
+        71,
+        83
+      ],
+      "fixed_optimizer_updates": 192,
+      "graph_forwards_per_model": 768,
+      "input_metadata": "both arms use the same six observed parities and per-report noise rates",
+      "test_families": {
+        "original": 1,
+        "arborescence": 1
+      },
+      "test_graphs_are_reused_across_every_experimental_cell": true,
+      "factorial_units": "training graph pool \u00d7 weak report draw \u00d7 neural initialization",
+      "caution": "repeated graph draws from the same trained model are NOT independent training replications; dataset size and sample exposure are confounded at fixed updates",
+      "arms": [
+        "weighted_soft",
+        "joint_independent"
+      ]
+    },
+    "per_size": {
+      "24": {
+        "original": {
+          "weighted_soft_cqa": 0.703125,
+          "joint_cqa": 0.7135416666666667,
+          "paired_delta": 0.010416666666666673,
+          "exploratory_3factor_percentile_interval": [
+            -0.34375,
+            0.2864583333333333
+          ],
+          "factorial_cells": 16,
+          "wins": 3,
+          "ties": 7,
+          "losses": 6,
+          "zero_CQA_soft": 0,
+          "zero_CQA_joint": 3,
+          "difference_by_pool": [
+            -0.21875,
+            0.17708333333333334,
+            0.23958333333333331,
+            -0.15624999999999997
+          ],
+          "difference_by_report_seed": [
+            0.0625,
+            -0.04166666666666665
+          ],
+          "difference_by_model_seed": [
+            -0.015625,
+            0.03645833333333334
+          ]
+        },
+        "arborescence": {
+          "weighted_soft_cqa": 0.6575520833333333,
+          "joint_cqa": 0.6236979166666666,
+          "paired_delta": -0.03385416666666667,
+          "exploratory_3factor_percentile_interval": [
+            -0.28125,
+            0.10937499999999997
+          ],
+          "factorial_cells": 16,
+          "wins": 4,
+          "ties": 7,
+          "losses": 5,
+          "zero_CQA_soft": 1,
+          "zero_CQA_joint": 2,
+          "difference_by_pool": [
+            -0.09375000000000001,
+            0.020833333333333322,
+            0.10416666666666666,
+            -0.16666666666666666
+          ],
+          "difference_by_report_seed": [
+            0.03385416666666666,
+            -0.1015625
+          ],
+          "difference_by_model_seed": [
+            0.005208333333333329,
+            -0.07291666666666667
+          ]
+        }
+      },
+      "192": {
+        "original": {
+          "weighted_soft_cqa": 0.6276041666666667,
+          "joint_cqa": 0.6848958333333333,
+          "paired_delta": 0.05729166666666666,
+          "exploratory_3factor_percentile_interval": [
+            -0.03125,
+            0.28125
+          ],
+          "factorial_cells": 16,
+          "wins": 4,
+          "ties": 9,
+          "losses": 3,
+          "zero_CQA_soft": 5,
+          "zero_CQA_joint": 2,
+          "difference_by_pool": [
+            0.07291666666666667,
+            0.19791666666666666,
+            -0.03125,
+            -0.010416666666666685
+          ],
+          "difference_by_report_seed": [
+            0.09375,
+            0.020833333333333336
+          ],
+          "difference_by_model_seed": [
+            -0.005208333333333329,
+            0.11979166666666666
+          ]
+        },
+        "arborescence": {
+          "weighted_soft_cqa": 0.6458333333333333,
+          "joint_cqa": 0.6223958333333333,
+          "paired_delta": -0.023437499999999997,
+          "exploratory_3factor_percentile_interval": [
+            -0.125,
+            0.0
+          ],
+          "factorial_cells": 16,
+          "wins": 0,
+          "ties": 14,
+          "losses": 2,
+          "zero_CQA_soft": 1,
+          "zero_CQA_joint": 2,
+          "difference_by_pool": [
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            -0.010416666666666657
+          ],
+          "difference_by_report_seed": [
+            0.0,
+            -0.04687499999999999
+          ],
+          "difference_by_model_seed": [
+            0.0,
+            -0.04687499999999999
+          ]
+        }
+      }
+    },
+    "factor_dispersion": {}
+  },
+  "nonmirrored": {
+    "protocol": {
+      "status": "exploratory non-mirrored topology shift",
+      "training_graph_seed": 314159,
+      "training_quadruples": 24,
+      "seeds": [
+        71,
+        73,
+        79,
+        83,
+        89,
+        97,
+        101,
+        103,
+        107,
+        109,
+        113,
+        127
+      ],
+      "noise_regimes": [
+        "heavy",
+        "correlated"
+      ],
+      "draw_seeds": [
+        6101,
+        6103,
+        6109,
+        6113
+      ],
+      "draw_quadruples": 24,
+      "graph_size_nodes": [
+        44,
+        68,
+        96
+      ],
+      "new_generator": "single asymmetric 3-zone network with two-edge in/out-degree-preserving switch",
+      "training_on_new_generator": false,
+      "caveats": "new graphs still synthetically constructed, intentionally balanced and structurally distinct from but not equivalent to natural graphs"
+    },
+    "comparisons": {
+      "heavy": {
+        "soft_cqa": 0.6475694444444444,
+        "joint_cqa": 0.6675347222222222,
+        "delta": 0.019965277777777773,
+        "exploratory_two_way_interval": [
+          -0.10505642361111109,
+          0.13368055555555555
+        ],
+        "wins": 5,
+        "ties": 4,
+        "losses": 3,
+        "mean_seed_differences": [
+          -0.09375000000000003,
+          0.020833333333333315,
+          0.42708333333333337,
+          0.052083333333333336,
+          0.0,
+          -0.02083333333333333,
+          0.2604166666666667,
+          0.0,
+          0.0,
+          -0.5208333333333334,
+          0.0,
+          0.11458333333333334
+        ],
+        "n_neural_seeds": 12,
+        "n_graph_draws": 4
+      },
+      "correlated": {
+        "soft_cqa": 0.697048611111111,
+        "joint_cqa": 0.8298611111111112,
+        "delta": 0.1328125,
+        "exploratory_two_way_interval": [
+          -0.030381944444444448,
+          0.28559027777777773
+        ],
+        "wins": 9,
+        "ties": 2,
+        "losses": 1,
+        "mean_seed_differences": [
+          0.0625,
+          0.05208333333333334,
+          0.27083333333333337,
+          0.07291666666666667,
+          0.0,
+          0.09374999999999997,
+          0.6770833333333333,
+          0.40625,
+          0.0,
+          -0.5208333333333334,
+          0.11458333333333334,
+          0.36458333333333326
+        ],
+        "n_neural_seeds": 12,
+        "n_graph_draws": 4
+      }
+    }
+  },
+  "cautions": [
+    "Earlier exploratory size sweep uses coupled report/model seeds and 8 test draws; do not pool its estimates with the factorial design.",
+    "Gnutella network feasibility result does not include a neural model.",
+    "Bootstrap units are seed factors and graph draws, not independent sample quadruples.",
+    "Post-hoc studies lack preregistered hypothesis testing."
+  ]
+}

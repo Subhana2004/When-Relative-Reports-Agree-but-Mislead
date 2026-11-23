@@ -1,0 +1,23 @@
+{
+ "source": "p2p-Gnutella08.txt from GitHub mirror aaziy/Graph-Algorithms",
+ "mirror_git_blob_sha": "f6d6ea2941ef6c892abe5be37a6b48c403d8c0f3",
+ "note": "Executed in connected GitHub data-processing environment on a 215359-character text edge list; official SNAP byte identity unverified. Reproduce with snap_external_audit.js and the exact pinned mirror blob. No neural network trained.",
+ "original_nodes": 6301,
+ "original_edges": 20777,
+ "requested_draws": 512,
+ "valid_degree_preserving_swaps": 512,
+ "failed_swaps": 0,
+ "neighborhood_nodes": 48,
+ "random_queries": "source uniformly sampled, two different targets uniformly sampled, independently of labels",
+ "answer_changing_swaps": 17,
+ "both_classes_present": 77,
+ "all_zero_quadruples": 411,
+ "all_zero_trivial_classifier_complete_quadruple_accuracy": 0.802734375,
+ "label_patterns": {
+  "1000": 7,"1010": 30,"1011": 1,"1111": 24,"0000": 411,"0010": 1,
+  "0101": 30,"0111": 2,"0011": 2,"0001": 2,"0100": 2
+ },
+ "mean_swap_attempts": 5.0,
+ "mean_neighborhood_directed_edges": 56.388671875,
+ "provenance_notice": "Source is a public dataset mirror. Published SNAP metadata 6301 nodes and 20777 directed edges. Not official-hash verified."
+}

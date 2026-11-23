@@ -1,0 +1,37 @@
+name: Reviewer-response validation
+on:
+  push:
+    paths:
+      - 'run_factorial_targeted.py'
+      - 'run_nonmirrored_validation.py'
+      - 'analyze_reviewer_results.py'
+      - 'test_reviewer_resolution.py'
+      - 'artifacts/reviewer_response_raw.zip'
+      - '.github/workflows/reviewer-extension.yml'
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reviewer-extension:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: Restore raw reviewer-response observations
+        run: unzip -o artifacts/reviewer_response_raw.zip -d .
+      - name: Test intervention and factorial invariants
+        run: |
+          export PYTHONPATH=.:WITNESS_TMLR_Anonymized_Supplement
+          python -m pytest -q test_reviewer_resolution.py
+      - name: Independently regenerate numerical summaries
+        run: |
+          sha256sum results/reviewer_resolution_summary.json > before.sha256
+          python analyze_reviewer_results.py
+          sha256sum results/reviewer_resolution_summary.json > after.sha256
+          diff -u before.sha256 after.sha256
